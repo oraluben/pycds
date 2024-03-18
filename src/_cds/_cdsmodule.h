@@ -17,7 +17,11 @@
 // adaptive interpreter things
 #if PY_MINOR_VERSION >= 11
 #include <internal/pycore_code.h>
+#if PY_MINOR_VERSION >= 13
+#include <internal/pycore_opcode_metadata.h>
+#else
 #include <internal/pycore_opcode.h>
+#endif
 #include <opcode.h>
 #endif
 
@@ -32,8 +36,10 @@
 #error Requires CPython 3.8+.
 #endif
 
-#if PY_MINOR_VERSION >= 12
+#if PY_MINOR_VERSION >= 13
 #include "clinic/_cdsmodule.c.h"
+#elif 
+#include "clinic/_cdsmodule-312.c.h"
 #else
 #include "clinic/_cdsmodule-b4-312.c.h"
 #endif
@@ -280,7 +286,7 @@ COPY_AND_DEOPT_CODE(PyCodeObject *res, PyCodeObject *src,
             instructions[++i] = _Py_MAKECODEUNIT(CACHE, 0);
         }
     }
-#else
+#elif PY_MINOR_VERSION == 12
     // codeobject.c:deopt_code() & specialize.c:_PyCode_Quicken()
     for (int i = 0, opcode = 0; i < code_count; ++i) {
         int previous_opcode = opcode;
@@ -312,6 +318,39 @@ COPY_AND_DEOPT_CODE(PyCodeObject *res, PyCodeObject *src,
                 instructions[i - 1].op.code = STORE_FAST__STORE_FAST;
                 break;
         }
+    }
+#else
+    // codeobject.c:deopt_code() & specialize.c:_PyCode_Quicken()
+    for (int i = 0; i < code_count; ++i) {
+        int opcode = _Py_GetBaseOpcode(res, i);
+        assert(opcode < MIN_INSTRUMENTED_OPCODE);
+        if (opcode == ENTER_EXECUTOR) {
+            _PyExecutorObject *exec = res->co_executors->executors[instructions[i].op.arg];
+            opcode = _PyOpcode_Deopt[exec->vm_data.opcode];
+            instructions[i].op.arg = exec->vm_data.oparg;
+        }
+        assert(opcode != ENTER_EXECUTOR);
+        int caches = _PyOpcode_Caches[opcode];
+        instructions[i].op.code = opcode;
+        for (int j = 1; j <= caches; j++) {
+            int initial_value;
+            switch (opcode) {
+                case JUMP_BACKWARD:
+                    initial_value = 0;
+                    break;
+                case POP_JUMP_IF_FALSE:
+                case POP_JUMP_IF_TRUE:
+                case POP_JUMP_IF_NONE:
+                case POP_JUMP_IF_NOT_NONE:
+                    initial_value = 0x5555;  // Alternating 0, 1 bits
+                    break;
+                default:
+                    initial_value = adaptive_counter_warmup();
+                    break;
+            }
+            instructions[i+j].cache = initial_value;
+        }
+        i += caches;
     }
 #endif
 }

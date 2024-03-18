@@ -10,7 +10,7 @@ endif ()
 
 # Only for IDE linting, skbuild will handle wheel dependencies.
 if (NOT SKBUILD)
-    #set(Python_ROOT_DIR "")
+    set(Python_ROOT_DIR "/Users/yyc/repo/py/pycds/venv")
 endif ()
 
 find_package(Python 3.8 REQUIRED COMPONENTS Interpreter Development.Module)

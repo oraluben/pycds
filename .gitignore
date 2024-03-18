@@ -182,3 +182,5 @@ _skbuild/
 ./*.json.old
 
 README.html
+
+.vscode/

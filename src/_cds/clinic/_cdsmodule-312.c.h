@@ -3,10 +3,10 @@ preserve
 [clinic start generated code]*/
 
 #if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
-#  include "pycore_gc.h"          // PyGC_Head
-#  include "pycore_runtime.h"     // _Py_ID()
+#  include "pycore_gc.h"            // PyGC_Head
+#  include "pycore_runtime.h"       // _Py_ID()
 #endif
-#include "pycore_modsupport.h"    // _PyArg_UnpackKeywords()
+
 
 PyDoc_STRVAR(_cds__create_archive__doc__,
 "_create_archive($module, /, a)\n"
@@ -261,7 +261,7 @@ _cds__set_mode(PyObject *module, PyObject *const *args, Py_ssize_t nargs, PyObje
     if (!args) {
         goto exit;
     }
-    mode = PyLong_AsInt(args[0]);
+    mode = _PyLong_AsInt(args[0]);
     if (mode == -1 && PyErr_Occurred()) {
         goto exit;
     }
@@ -347,7 +347,7 @@ _cds__set_verbose(PyObject *module, PyObject *const *args, Py_ssize_t nargs, PyO
     if (!args) {
         goto exit;
     }
-    mode = PyLong_AsInt(args[0]);
+    mode = _PyLong_AsInt(args[0]);
     if (mode == -1 && PyErr_Occurred()) {
         goto exit;
     }
@@ -356,4 +356,4 @@ _cds__set_verbose(PyObject *module, PyObject *const *args, Py_ssize_t nargs, PyO
 exit:
     return return_value;
 }
-/*[clinic end generated code: output=60d6de4c8fb64fec input=a9049054013a1b77]*/
+/*[clinic end generated code: output=b052111ddd3acec0 input=a9049054013a1b77]*/
