@@ -19,8 +19,8 @@ add_compile_definitions(Py_BUILD_CORE Py_BUILD_CORE_MODULE)  # for sizeof(PyGC_H
 add_compile_definitions(NEED_OPCODE_TABLES)  # for _PyOpcode_Caches and _PyOpcode_Deopt
 
 python_add_library(_cds MODULE WITH_SOABI src/_cds/_cdsmodule.c src/_cds/lookup_table.c src/_cds/hashtable.c src/_cds/platforms.c)
-# clinic-generated files access core header.
 target_include_directories(_cds PRIVATE "${Python_INCLUDE_DIRS}/internal")
+target_include_directories(_cds PRIVATE "${Python_INCLUDE_DIRS}/internal/mimalloc")
 
 # todo: if find cpython repo, run clinic
 # currently we manually run `python3 ../cpython/Tools/clinic/clinic.py --make --srcdir src/_cds`
