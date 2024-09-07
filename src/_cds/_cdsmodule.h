@@ -182,6 +182,14 @@ _PyCDS_InPySingleton(PyObject *);
 #define IF_11_OR_EARLIER(xx) xx
 #endif
 
+#if PY_MINOR_VERSION >= 13
+#define IF_13_OR_LATER(xx) xx
+#define IF_12_OR_EARLIER(xx)
+#else
+#define IF_13_OR_LATER(_)
+#define IF_12_OR_EARLIER(xx) xx
+#endif
+
 #define IFF_11(xx) IF_11_OR_EARLIER(IF_11_OR_LATER(xx))
 
 #define NOOP_PLACEHOLDER(xx)
@@ -237,6 +245,8 @@ _PyCDS_InPySingleton(PyObject *);
 #define LIT(lit_name) \
     (PyObject *)(&_Py_SINGLETON(strings).literals._py_##lit_name)
 
+// TODO: https://github.com/python/cpython/commit/9769b7ae064a0546a98cbcbec2561dbaba20cd23
+
 #define UNWIND_STATIC                                                   \
     HANDLE_LITERAL(LIT(anon_dictcomp))                                  \
     HANDLE_LITERAL(LIT(anon_genexpr))                                   \
@@ -246,7 +256,7 @@ _PyCDS_InPySingleton(PyObject *);
     HANDLE_LITERAL(LIT(anon_setcomp))                                   \
     HANDLE_LITERAL(LIT(anon_string))                                    \
     HANDLE_LITERAL(LIT(anon_unknown))                                   \
-    HANDLE_LITERAL(LIT(close_br))                                       \
+    IF_12_OR_EARLIER(HANDLE_LITERAL(LIT(close_br)))                     \
     HANDLE_LITERAL(LIT(dbl_close_br))                                   \
     HANDLE_LITERAL(LIT(dbl_open_br))                                    \
     HANDLE_LITERAL(LIT(dbl_percent))                                    \
@@ -256,7 +266,7 @@ _PyCDS_InPySingleton(PyObject *);
     HANDLE_LITERAL(LIT(json_decoder))                                   \
     HANDLE_LITERAL(LIT(list_err))                                       \
     HANDLE_LITERAL(LIT(newline))                                        \
-    HANDLE_LITERAL(LIT(open_br))                                        \
+    IF_12_OR_EARLIER(HANDLE_LITERAL(LIT(open_br)))                      \
     HANDLE_LITERAL(LIT(percent))                                        \
     HANDLE_LITERAL(LIT(shim_name))                                      \
     HANDLE_LITERAL(LIT(utf_8))                                          \
